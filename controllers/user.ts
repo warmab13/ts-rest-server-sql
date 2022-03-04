@@ -36,9 +36,34 @@ export const getUser = async( req: Request, res: Response)=>{
     })
 }
 
-export const createUser = ( req: Request, res: Response)=>{
+export const createUser = async( req: Request, res: Response)=>{
 
     const { body } = req;
+
+    const emailExist = await User.findOne({
+        where:{
+            email: body.email
+        }
+    })
+
+    if(emailExist){
+        return res.status(400).json({
+            msg: `Already exists a user with this email ${body.email}`
+        })
+    }
+
+    try {
+        const user = User.build(body);
+        await user.save();
+
+        res.json(user)
+
+    } catch (error:any) {
+        res.status(500).json({
+            msg: 'Talk to administrator',
+            error
+        })
+    }
 
     res.json({
         msg: 'createUser',
@@ -46,9 +71,28 @@ export const createUser = ( req: Request, res: Response)=>{
     })
 }
 
-export const updateUser = ( req: Request, res: Response)=>{
+export const updateUser = async( req: Request, res: Response)=>{
     const { id } = req.params;
     const { body } = req;
+
+    try {
+        const user = await User.findByPk(id);
+        if( !user ){
+            return res.status(404).json({
+                msg: `The user with ID ${id} does not exist`
+            })
+        }
+
+        await user.update(body);
+
+        res.json( user )
+
+    } catch (error:any) {
+        res.status(500).json({
+            msg: 'Talk to administrator',
+            error
+        })
+    }
 
     res.json({
         id,

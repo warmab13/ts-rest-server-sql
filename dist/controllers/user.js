@@ -44,23 +44,60 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.getUser = getUser;
-const createUser = (req, res) => {
+const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
+    const emailExist = yield user_1.default.findOne({
+        where: {
+            email: body.email
+        }
+    });
+    if (emailExist) {
+        return res.status(400).json({
+            msg: `Already exists a user with this email ${body.email}`
+        });
+    }
+    try {
+        const user = user_1.default.build(body);
+        yield user.save();
+        res.json(user);
+    }
+    catch (error) {
+        res.status(500).json({
+            msg: 'Talk to administrator',
+            error
+        });
+    }
     res.json({
         msg: 'createUser',
         body
     });
-};
+});
 exports.createUser = createUser;
-const updateUser = (req, res) => {
+const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { body } = req;
+    try {
+        const user = yield user_1.default.findByPk(id);
+        if (!user) {
+            return res.status(404).json({
+                msg: `The user with ID ${id} does not exist`
+            });
+        }
+        yield user.update(body);
+        res.json(user);
+    }
+    catch (error) {
+        res.status(500).json({
+            msg: 'Talk to administrator',
+            error
+        });
+    }
     res.json({
         id,
         msg: 'updateUser',
         body
     });
-};
+});
 exports.updateUser = updateUser;
 const deleteUser = (req, res) => {
     const { id } = req.params;
