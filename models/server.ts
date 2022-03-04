@@ -1,6 +1,6 @@
 import express, {Application}  from 'express';
 import userRoutes from '../routes/user';
-
+import cors from 'cors';
 class Server {
 
     private app: Application;
@@ -13,8 +13,22 @@ class Server {
         this.app = express();
         this.port = process.env.PORT || '8000';
 
+        //call middlewares
+        this.middlewares();
+
         //create routes
         this.routes();
+    }
+
+    //TODO: Connect database
+
+    middlewares(){
+        //CORS
+        this.app.use( cors() );
+        //read Body
+        this.app.use( express.json() );
+        //Public folder
+        this.app.use( express.static('public') )
     }
 
     routes(){
