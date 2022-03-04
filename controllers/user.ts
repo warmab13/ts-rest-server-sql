@@ -101,12 +101,29 @@ export const updateUser = async( req: Request, res: Response)=>{
     })
 }
 
-export const deleteUser = ( req: Request, res: Response)=>{
+//Create logic delete
+export const deleteUser = async( req: Request, res: Response)=>{
 
     const { id } = req.params;
 
+    try {
+        const user = await User.findByPk(id);
+        if( !user ){
+            return res.status(404).json({
+                msg: `The user with ID ${id} does not exist`
+            })
+        }
+        
+        //await user.destroy();
+    
+        await user.update({ status: 0 });
+        
+    } catch (error) {
+        res.json(error);
+    }
+
     res.json({
-        id,
-        msg: 'getUsers'
+        user,
+        msg: 'Delete user'
     })
 }

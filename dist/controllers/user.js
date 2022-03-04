@@ -99,12 +99,26 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
 });
 exports.updateUser = updateUser;
-const deleteUser = (req, res) => {
+//Create logic delete
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
+    try {
+        const user = yield user_1.default.findByPk(id);
+        if (!user) {
+            return res.status(404).json({
+                msg: `The user with ID ${id} does not exist`
+            });
+        }
+        //await user.destroy();
+        yield user.update({ status: 0 });
+    }
+    catch (error) {
+        res.json(error);
+    }
     res.json({
-        id,
-        msg: 'getUsers'
+        user,
+        msg: 'Delete user'
     });
-};
+});
 exports.deleteUser = deleteUser;
 //# sourceMappingURL=user.js.map
